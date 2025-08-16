@@ -25,4 +25,6 @@ venv/
 Thumbs.db
 
 # --- Project Specific ---
-dataset/       # ignore your dataset folder
+dataset/
+dataset/
+*.csv   
