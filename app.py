@@ -1,8 +1,36 @@
 import pickle
 import streamlit as st
 import requests
+import gdown
+import os
 
-# Custom CSS styling
+# ==========================
+# Download Pickle Files
+# ==========================
+
+# File paths
+os.makedirs("model", exist_ok=True)
+movie_list_path = "model/movie_list.pkl"
+similarity_path = "model/similarity.pkl"
+
+# Google Drive File IDs (replace with your actual IDs)
+movie_list_id = "1ysPYaeZr3Svyh5kYaVDluamx7yYFy5_t"
+similarity_id = "15KROecMl3VERFTlwW2eYgke-HpZNJR-z"
+
+# Download if not present
+if not os.path.exists(movie_list_path):
+    gdown.download(f"https://drive.google.com/uc?id={movie_list_id}", movie_list_path, quiet=False)
+
+if not os.path.exists(similarity_path):
+    gdown.download(f"https://drive.google.com/uc?id={similarity_id}", similarity_path, quiet=False)
+
+# Load data
+movies = pickle.load(open(movie_list_path, 'rb'))
+similarity = pickle.load(open(similarity_path, 'rb'))
+
+# ==========================
+# Streamlit Styling
+# ==========================
 st.markdown("""
     <style>
     body {
@@ -70,6 +98,10 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+
+# ==========================
+# Helper Functions
+# ==========================
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=bae1e49fea504a1bf1ffd2537aa4cebd&language=en-US"
     try:
@@ -84,12 +116,13 @@ def fetch_poster(movie_id):
     except requests.RequestException:
         return "https://via.placeholder.com/500x750?text=Poster+Not+Found"
 
+
 def recommend(movie):
     index = movies[movies['title'] == movie].index[0]
     distances = sorted(list(enumerate(similarity[index])), reverse=True, key=lambda x: x[1])
-    
+
     recommended_movies = []
-    for i in distances[1:6]:  # Top 5 recommendations excluding the movie itself
+    for i in distances[1:6]:
         movie_id = movies.iloc[i[0]].movie_id
         title = movies.iloc[i[0]].title
         poster_url = fetch_poster(movie_id)
@@ -99,22 +132,19 @@ def recommend(movie):
         })
     return recommended_movies
 
-# App Header
+
+# ==========================
+# Streamlit UI
+# ==========================
 st.markdown('<h1 class="title">🎬 Movie Recommender</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">✨ Discover Your Next Favorite Movie ✨</p>', unsafe_allow_html=True)
 
-# Load data
-movies = pickle.load(open('model/movie_list.pkl', 'rb'))
-similarity = pickle.load(open('model/similarity.pkl', 'rb'))
-
-# Movie selection dropdown
 selected_movie = st.selectbox(
     "🔍 Search for your favorite movie...",
     movies['title'].values,
     key="selectbox"
 )
 
-# Recommendation button and display
 if st.button('🎥 Get Recommendations'):
     with st.spinner('🔮 Finding the best movies for you...'):
         recommendations = recommend(selected_movie)
