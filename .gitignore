@@ -4,8 +4,6 @@ __pycache__/
 *.so
 *.egg
 *.egg-info/
-*.pkl
-
 # --- Virtual Environment ---
 venv/
 .env/
