@@ -1,0 +1,28 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+*.pkl
+
+# --- Virtual Environment ---
+venv/
+.env/
+.envrc
+*.env
+
+# --- Jupyter & VSCode ---
+.ipynb_checkpoints/
+.vscode/
+
+# --- Streamlit & Cache ---
+.streamlit/
+.cache/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+
+# --- Project Specific ---
+dataset/       # ignore your dataset folder
